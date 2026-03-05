@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            color: #2c3e50;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            font-weight: 300;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 50px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            border: 2px solid #bdc3c7;
+            background: white;
+            color: #2c3e50;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            text-transform: capitalize;
+        }
+
+        .tab-btn:hover {
+            border-color: #3498db;
+            color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .tab-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .gallery {
+            column-count: 1;
+            column-gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        @media (min-width: 768px) {
+            .gallery {
+                column-count: 2;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .gallery {
+                column-count: 3;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .gallery {
+                column-count: 4;
+            }
+        }
+
+        .gallery-item {
+            break-inside: avoid;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            background: white;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.02);
+        }
+
+        .gallery-caption {
+            padding: 15px;
+            background: white;
+            text-align: center;
+            font-size: 0.95em;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            width: auto;
+            height: auto;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .modal-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+            color: white;
+            padding: 30px 20px 20px;
+            text-align: center;
+            font-size: 1.1em;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            z-index: 1001;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state p {
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .modal-content {
+                max-width: 95vw;
+                max-height: 80vh;
+            }
+
+            .close-btn {
+                font-size: 28px;
+                top: 10px;
+                right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Gallery</h1>
+            <p>A curated collection of moments</p>
+        </div>
+
+        <div class="tabs" id="tabsContainer"></div>
+
+        <div class="gallery" id="galleryContainer"></div>
+
+        <div class="modal" id="modal">
+            <span class="close-btn" id="closeBtn">&times;</span>
+            <div class="modal-content">
+                <img id="modalImage" src="" alt="Gallery Image">
+                <div class="modal-caption" id="modalCaption"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class Gallery {
+            constructor() {
+                this.images = [];
+                this.photographers = [];
+                this.currentPhotographer = null;
+                this.init();
+            }
+
+            async init() {
+                await this.loadImages();
+                this.processImages();
+                this.renderTabs();
+                this.setupModalEvents();
+                if (this.photographers.length > 0) {
+                    this.showPhotographer(this.photographers[0]);
+                }
+            }
+
+            async loadImages() {
+                try {
+                    const response = await fetch('gallery/');
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const links = Array.from(doc.querySelectorAll('a'));
+                    
+                    this.images = links
+                        .map(a => a.href)
+                        .filter(href => /\.(jpg|jpeg|png|gif|webp)$/i.test(href))
+                        .map(href => href.split('/').pop());
+                } catch (error) {
+                    console.log('Using fallback image loading method');
+                    // Fallback: Images will be loaded from directory structure
+                    this.images = await this.getImagesFromDirectory();
+                }
+            }
+
+            async getImagesFromDirectory() {
+                // This attempts to load images from a known directory listing
+                // You may need to adjust based on your server configuration
+                const imageNames = [];
+                try {
+                    const response = await fetch('gallery/index.json').catch(() => null);
+                    if (response && response.ok) {
+                        const data = await response.json();
+                        return data.images || [];
+                    }
+                } catch (error) {
+                    console.log('Gallery index not found, using hardcoded approach');
+                }
+                return imageNames;
+            }
+
+            parseFilename(filename) {
+                // Format: prefix.datestring.name.extension
+                // Example: b1.05032026.roshan.jpg
+                const parts = filename.replace(/\.[^/.]+$/, '').split('.');
+                
+                if (parts.length >= 3) {
+                    const dateStr = parts[1];
+                    const name = parts[2];
+                    
+                    // Parse date: 05032026 -> 05.03.2026
+                    const day = dateStr.substring(0, 2);
+                    const month = dateStr.substring(2, 4);
+                    const year = dateStr.substring(4, 8);
+                    const date = `${day}.${month}.${year}`;
+                    const dateObj = new Date(`${year}-${month}-${day}`);
+                    
+                    return { name, date, dateObj, filename };
+                }
+                return null;
+            }
+
+            processImages() {
+                this.images = this.images
+                    .map(filename => this.parseFilename(filename))
+                    .filter(img => img !== null)
+                    .sort((a, b) => b.dateObj - a.dateObj);
+
+                this.photographers = [...new Set(this.images.map(img => img.name))].sort();
+            }
+
+            renderTabs() {
+                const tabsContainer = document.getElementById('tabsContainer');
+                tabsContainer.innerHTML = '';
+
+                this.photographers.forEach(photographer => {
+                    const btn = document.createElement('button');
+                    btn.className = 'tab-btn';
+                    btn.textContent = photographer;
+                    btn.onclick = () => this.showPhotographer(photographer);
+                    tabsContainer.appendChild(btn);
+                });
+            }
+
+            showPhotographer(photographer) {
+                this.currentPhotographer = photographer;
+                
+                // Update active tab
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.textContent === photographer);
+                });
+
+                // Filter and render gallery
+                const filtered = this.images.filter(img => img.name === photographer);
+                this.renderGallery(filtered);
+            }
+
+            renderGallery(images) {
+                const container = document.getElementById('galleryContainer');
+                container.innerHTML = '';
+
+                if (images.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>No images found</p></div>';
+                    return;
+                }
+
+                images.forEach(img => {
+                    const item = document.createElement('div');
+                    item.className = 'gallery-item';
+                    item.innerHTML = `
+                        <img src="gallery/${img.filename}" alt="${img.name}" data-date="${img.date}">
+                        <div class="gallery-caption">${img.date}</div>
+                    `;
+                    item.onclick = () => this.openModal(img);
+                    container.appendChild(item);
+                });
+            }
+
+            openModal(img) {
+                const modal = document.getElementById('modal');
+                const modalImage = document.getElementById('modalImage');
+                const modalCaption = document.getElementById('modalCaption');
+
+                modalImage.src = `gallery/${img.filename}`;
+                modalCaption.textContent = `${img.name} • ${img.date}`;
+                modal.classList.add('active');
+            }
+
+            closeModal() {
+                document.getElementById('modal').classList.remove('active');
+            }
+
+            setupModalEvents() {
+                const modal = document.getElementById('modal');
+                const closeBtn = document.getElementById('closeBtn');
+
+                closeBtn.onclick = () => this.closeModal();
+                modal.onclick = (e) => {
+                    if (e.target === modal) this.closeModal();
+                };
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') this.closeModal();
+                });
+            }
+        }
+
+        // Initialize gallery when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new Gallery();
+        });
+    </script>
+</body>
+</html>
