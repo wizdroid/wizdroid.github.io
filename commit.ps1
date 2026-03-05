@@ -1,5 +1,5 @@
 param(
-    [Parameter(Mandatory=$true, HelpMessage="Enter a commit message")]
+    [Parameter(Mandatory = $true, HelpMessage = "Enter a commit message")]
     [string]$Message
 )
 
