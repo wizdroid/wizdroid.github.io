@@ -357,8 +357,38 @@
             }
 
             async loadImages() {
+                // Determine if we are on localhost to prioritize local JSON over remote GitHub API
+                const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                
+                if (!isLocalhost) {
+                    try {
+                        const repoUrl = 'https://api.github.com/repos/wizdroid/wizdroid.github.io/contents/gallery';
+                        const ghResponse = await fetch(repoUrl);
+                        if (ghResponse.ok) {
+                            const data = await ghResponse.json();
+                            const validExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+                            const imageFiles = data
+                                .filter(item => item.type === 'file')
+                                .filter(item => {
+                                    const ext = item.name.substring(item.name.lastIndexOf('.')).toLowerCase();
+                                    return validExts.includes(ext);
+                                })
+                                .map(item => item.name);
+                                
+                            if (imageFiles.length > 0) {
+                                // Sort reverse to show newest first conceptually
+                                this.images = imageFiles.sort().reverse();
+                                return; // Successfully loaded dynamically
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('Dynamic GitHub API fetch failed, falling back to local index.json', error);
+                    }
+                }
+
+                // Fallback to static index.json (or primary method if on localhost)
                 try {
-                    const response = await fetch('gallery/index.json');
+                    const response = await fetch('gallery/index.json?_t=' + new Date().getTime()); // Prevent caching
                     if (response.ok) {
                         const data = await response.json();
                         this.images = data.images || [];
