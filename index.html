@@ -76,7 +76,7 @@
         .tabs {
             display: flex;
             gap: 1rem;
-            margin-bottom: 3rem;
+            b1.10032026.meita.png margin-bottom: 3rem;
             flex-wrap: wrap;
             justify-content: center;
             animation: fadeIn 1s var(--transition);
@@ -359,10 +359,10 @@
             async loadImages() {
                 // Determine if we are on localhost to prioritize local JSON over remote GitHub API
                 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-                
+
                 if (!isLocalhost) {
                     try {
-                        const repoUrl = 'https://api.github.com/repos/wizdroid/wizdroid.github.io/contents/gallery';
+                        const repoUrl = 'https://api.github.com/repos/wizdroid/wizdroid.github.io/contents/gallery?ref=main&t=' + new Date().getTime();
                         const ghResponse = await fetch(repoUrl);
                         if (ghResponse.ok) {
                             const data = await ghResponse.json();
@@ -374,7 +374,7 @@
                                     return validExts.includes(ext);
                                 })
                                 .map(item => item.name);
-                                
+
                             if (imageFiles.length > 0) {
                                 // Sort reverse to show newest first conceptually
                                 this.images = imageFiles.sort().reverse();
